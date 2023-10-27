@@ -32,6 +32,7 @@
   },
   "type": "module",
   "dependencies": {
-    "@turf/truncate": "^6.5.0"
+    "@turf/truncate": "^6.5.0",
+    "@types/geojson": "^7946.0.12"
   }
 }

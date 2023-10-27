@@ -1,5 +1,16 @@
 <script lang="ts">
 	import truncate from '@turf/truncate';
+	import type { GeoJSON, FeatureCollection, Feature, GeoJsonProperties, Geometry } from 'geojson';
+
+	let coordinatePrecision = 6;
+	let geoJSONData: GeoJSON | null = null;
+	let processedGeoJSON: string | null = null;
+	let uploadedFileSize: number | null = null;
+	let processedGeoJSONSize: number | null = null;
+	let percentageReduction: number | null = null;
+
+	let availableProperties: string[] = [];
+	let selectedProperties: Set<string> = new Set();
 
 	function formatFileSize(size: number) {
 		if (size < 10 ** 3) {
@@ -20,12 +31,21 @@
 		return ((originalSize - reducedSize) / originalSize) * 100;
 	}
 
-	let coordinatePrecision = 6;
-	let geoJSONData = null;
-	let processedGeoJSON = null;
-	let uploadedFileSize: number | null = null;
-	let processedGeoJSONSize: number | null = null;
-	let percentageReduction: number | null = null;
+	function extractProperties(geoJSONData: any) {
+		if (geoJSONData && geoJSONData.features && geoJSONData.features.length > 0) {
+			const feature = geoJSONData.features[0]; // Consider the first feature
+			return Object.keys(feature.properties || {});
+		}
+		return [];
+	}
+
+	const togglePropertySelection = (property: string) => {
+		if (selectedProperties.has(property)) {
+			selectedProperties.delete(property);
+		} else {
+			selectedProperties.add(property);
+		}
+	};
 
 	const handleFileChange = (event: Event) => {
 		const input = event.target as HTMLInputElement | null;
@@ -33,13 +53,14 @@
 			const file = input.files?.[0];
 			if (file) {
 				uploadedFileSize = file.size;
-				console.log(uploadedFileSize);
 
 				const reader = new FileReader();
 				reader.onload = (event) => {
 					const result = event.target?.result;
 					if (result && typeof result === 'string') {
 						geoJSONData = JSON.parse(result);
+						availableProperties = extractProperties(geoJSONData);
+						selectedProperties = new Set(availableProperties);
 					}
 				};
 				reader.readAsText(file);
@@ -47,13 +68,36 @@
 		}
 	};
 
+	const filterProperties = (geojson: GeoJSON): FeatureCollection => {
+		const processedFeatures: Feature<Geometry, GeoJsonProperties>[] = geoJSONData.features.map(
+			(feature) => {
+				const filteredProperties = Object.keys(feature.properties)
+					.filter((property) => selectedProperties.has(property))
+					.reduce((obj, key) => {
+						obj[key] = feature.properties[key];
+						return obj;
+					}, {});
+
+				return {
+					...feature,
+					properties: filteredProperties
+				};
+			}
+		);
+
+		const processedGeoJSON: FeatureCollection = {
+			type: 'FeatureCollection',
+			features: processedFeatures
+		};
+
+		return processedGeoJSON;
+	};
+
 	const processGeoJSON = () => {
 		if (geoJSONData) {
-			const precision = coordinatePrecision;
-
-			const options = { precision: precision };
-			const truncatedGeoJSON = truncate(geoJSONData, options);
-
+			let filteredGeoJSON = filterProperties(geoJSONData);
+			const options = { precision: coordinatePrecision };
+			const truncatedGeoJSON = truncate(filteredGeoJSON, options);
 			processedGeoJSON = JSON.stringify(truncatedGeoJSON);
 			processedGeoJSONSize = new TextEncoder().encode(processedGeoJSON).length;
 		}
@@ -67,7 +111,7 @@
 	// Function to trigger the download of the processed GeoJSON
 	const downloadProcessedGeoJSON = () => {
 		if (processedGeoJSON) {
-			const blob = new Blob([processedGeoJSON], { type: 'application/json' });
+			const blob = new Blob([processedGeoJSON], { type: 'application/geo+json' });
 			const url = URL.createObjectURL(blob);
 			const a = document.createElement('a');
 			a.href = url;
@@ -95,6 +139,23 @@
 	step="1"
 	bind:value={coordinatePrecision}
 />
+
+<p>Include Properties:</p>
+{#if availableProperties.length > 0}
+	{#each availableProperties as property}
+		<label>
+			<input
+				type="checkbox"
+				checked={selectedProperties.has(property)}
+				on:change={() => togglePropertySelection(property)}
+			/>
+			{property}
+		</label>
+	{/each}
+{:else}
+	<p>No properties available.</p>
+{/if}
+
 <button on:click={processGeoJSON}>Reduce size</button>
 <button on:click={downloadProcessedGeoJSON}>Download Processed GeoJSON</button>
 
