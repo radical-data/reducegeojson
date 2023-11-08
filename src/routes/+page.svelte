@@ -2,6 +2,8 @@
 	import truncate from '@turf/truncate';
 	import type { GeoJSON, FeatureCollection, Feature, GeoJsonProperties, Geometry } from 'geojson';
 
+	let originalFilename: string | null = null;
+
 	let coordinatePrecision = 6;
 	let geoJSONData: GeoJSON | null = null;
 	let processedGeoJSON: string | null = null;
@@ -24,9 +26,9 @@
 		}
 	}
 
-	function calculatePercentageReduction(originalSize: number, reducedSize: number) {
-		if (originalSize === 0) {
-			return 0; // Prevent division by zero
+	function calculatePercentageReduction(originalSize: number | null, reducedSize: number | null) {
+		if (originalSize === 0 || originalSize == null || reducedSize == null) {
+			return 0;
 		}
 		return ((originalSize - reducedSize) / originalSize) * 100;
 	}
@@ -53,6 +55,7 @@
 			const file = input.files?.[0];
 			if (file) {
 				uploadedFileSize = file.size;
+				originalFilename = file.name;
 
 				const reader = new FileReader();
 				reader.onload = (event) => {
@@ -69,7 +72,7 @@
 	};
 
 	const filterProperties = (geojson: GeoJSON): FeatureCollection => {
-		const processedFeatures: Feature<Geometry, GeoJsonProperties>[] = geoJSONData.features.map(
+		const processedFeatures: Feature<Geometry, GeoJsonProperties>[] = geojson.features.map(
 			(feature) => {
 				const filteredProperties = Object.keys(feature.properties)
 					.filter((property) => selectedProperties.has(property))
@@ -108,16 +111,17 @@
 		}
 	};
 
-	// Function to trigger the download of the processed GeoJSON
 	const downloadProcessedGeoJSON = () => {
-		if (processedGeoJSON) {
+		if (processedGeoJSON && originalFilename) {
 			const blob = new Blob([processedGeoJSON], { type: 'application/geo+json' });
-			const url = URL.createObjectURL(blob);
 			const a = document.createElement('a');
-			a.href = url;
-			a.download = 'processed.geojson';
+			a.href = URL.createObjectURL(blob);
+
+			const filteredFileName = originalFilename.replace('.geojson', '_filtered.geojson');
+
+			a.download = filteredFileName;
 			a.click();
-			URL.revokeObjectURL(url);
+			URL.revokeObjectURL(a.href);
 		}
 	};
 </script>
