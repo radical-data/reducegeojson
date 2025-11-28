@@ -2,18 +2,18 @@
 	import '../style.css';
 </script>
 
-<div class="min-h-screen bg-slate-950 text-slate-100">
-	<div class="mx-auto flex min-h-screen max-w-4xl flex-col px-4 py-10 gap-6">
+<div class="min-h-screen">
+	<div class="mx-auto flex min-h-screen max-w-5xl flex-col gap-6 px-6 py-8">
 		<main class="flex-1">
 			<slot />
 		</main>
-		<footer class="border-t border-slate-800 pt-4 text-xs text-slate-500">
+		<footer class="border-t border-slate-200 pt-4 text-xs text-slate-500">
 			Developed by
 			<a
 				href="https://radicaldata.org"
 				target="_blank"
 				rel="noopener"
-				class="font-medium text-sky-400 hover:text-sky-300"
+				class="font-medium text-sky-700 hover:text-sky-800"
 			>
 				Radical Data
 			</a>
@@ -23,7 +23,7 @@
 				href="https://radicaldata.org"
 				target="_blank"
 				rel="noopener"
-				class="font-medium text-sky-400 hover:text-sky-300"
+				class="font-medium text-sky-700 hover:text-sky-800"
 			>
 				radicaldata.org
 			</a>.

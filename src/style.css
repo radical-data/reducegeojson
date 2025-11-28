@@ -3,8 +3,8 @@
 /* App-level base styles */
 html,
 body {
-	background-color: theme(colors.slate.950);
-	color: theme(colors.slate.100);
+	background-color: theme(colors.slate.50);
+	color: theme(colors.slate.900);
 	-webkit-font-smoothing: antialiased;
 	-moz-osx-font-smoothing: grayscale;
 }
@@ -14,10 +14,11 @@ body {
 }
 
 a {
-	color: theme(colors.sky.400);
+	color: theme(colors.sky.700);
 	text-underline-offset: 2px;
 }
 
 a:hover {
+	color: theme(colors.sky.800);
 	text-decoration: underline;
 }
