@@ -186,13 +186,15 @@
 
 <h1 class="text-3xl font-semibold tracking-tight text-slate-50">GeoJSON Size Reducer</h1>
 
-<p class="text-slate-300">A tool to reduce the file size of GeoJSON files for web optimisation.</p>
+<p class="mt-2 text-slate-300">
+	A tool to reduce the file size of GeoJSON files for web optimisation.
+</p>
 
 <p class="text-sm text-slate-400">
 	All conversions are done locally in your browser; your GeoJSON never leaves your machine.
 </p>
 
-<p class="mt-3 text-xs text-slate-500">
+<p class="mt-4 max-w-3xl text-xs text-slate-500">
 	Developed by
 	<a
 		href="https://radicaldata.org"
@@ -211,12 +213,8 @@
 	>
 		Queering the Map
 	</a>
-	— and used in production on Queering the Map.
-</p>
-
-<p class="mt-1 text-xs text-slate-500">
-	For more tools, big and small, and other work at the intersection of technology, art and activism,
-	visit
+	— and used in production on Queering the Map. For more tools at the intersection of technology, art
+	and activism, visit
 	<a
 		href="https://radicaldata.org"
 		target="_blank"
@@ -516,13 +514,14 @@
 
 			<p class="mt-2 text-sm text-slate-300">
 				Many GeoJSON files include far more decimal places in their coordinates than any real
-				application needs — often implying centimetre or even atomic-level accuracy. All those extra
-				digits make the files unnecessarily large.
+				application needs — often implying centimetre- or even atomic-level accuracy. All those
+				extra digits make the files unnecessarily large.
 			</p>
 
 			<p class="mt-2 text-sm text-slate-300">
 				This tool lets you trim coordinate precision down to something sensible and drop properties
-				you don't need, making your data dramatically smaller for web use.
+				you don't need, making your data dramatically smaller for use on the web while keeping the
+				overall shape intact.
 			</p>
 
 			<p class="mt-2 text-xs text-slate-500">
