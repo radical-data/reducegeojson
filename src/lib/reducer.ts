@@ -10,9 +10,9 @@ export function reduceFeatureCollection(
 	fc: FeatureCollection,
 	options: ReductionOptions
 ): FeatureCollection {
-	const filtered = filterProperties(fc, options.propertiesToKeep);
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	return truncate(filtered as any, { precision: options.precision });
+	const truncated = truncate(fc as any, { precision: options.precision });
+	return filterProperties(truncated, options.propertiesToKeep);
 }
 
 function filterProperties(fc: FeatureCollection, propertiesToKeep: Set<string>): FeatureCollection {
@@ -26,7 +26,13 @@ function filterProperties(fc: FeatureCollection, propertiesToKeep: Set<string>):
 					filteredProps[key] = props[key];
 				}
 			}
-			return { ...feature, properties: filteredProps };
+			// Exclude properties from the spread, then conditionally add it back
+			// eslint-disable-next-line @typescript-eslint/no-unused-vars
+			const { properties, ...rest } = feature;
+			return {
+				...rest,
+				...(Object.keys(filteredProps).length > 0 ? { properties: filteredProps } : {})
+			} as typeof feature; // Type assertion to preserve intentional omission of properties
 		})
 	};
 }
