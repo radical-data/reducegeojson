@@ -3,6 +3,7 @@
 	import { formatFileSize, calculatePercentageReduction } from '$lib/geojson-utils';
 	import { reduceFeatureCollection } from '$lib/reducer';
 	import { SvelteSet } from 'svelte/reactivity';
+	import GitHubIcon from '$lib/GitHubIcon.svelte';
 
 	let originalFilename: string | null = $state(null);
 
@@ -217,7 +218,21 @@
 
 <h1 class="text-3xl font-semibold tracking-tight text-slate-900">GeoJSON Size Reducer</h1>
 
-<p class="mt-2 text-slate-700">
+<p class="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-[11px] font-semibold tracking-wide">
+	<span class="uppercase text-slate-500">Open source</span>
+	<span class="text-slate-400">·</span>
+	<a
+		href="https://github.com/radical-data/reducegeojson"
+		target="_blank"
+		rel="noopener noreferrer"
+		class="inline-flex items-center gap-1 text-sky-700 hover:text-sky-800 hover:underline underline-offset-2"
+	>
+		<GitHubIcon className="h-3.5 w-3.5" />
+		<span>View source on GitHub</span>
+	</a>
+</p>
+
+<p class="mt-3 text-slate-700">
 	A tool to reduce the file size of GeoJSON files for web optimisation.
 </p>
 
@@ -501,7 +516,7 @@
 						<a
 							href="https://radicaldata.org"
 							target="_blank"
-							rel="noopener"
+							rel="noopener noreferrer"
 							class="font-medium text-sky-700 hover:text-sky-800"
 						>
 							explore more of our work →
