@@ -66,7 +66,7 @@ describe('reduceFeatureCollection', () => {
 		});
 
 		expect(result.features).toHaveLength(1);
-		expect(result.features[0].properties).toEqual({});
+		expect(result.features[0]).not.toHaveProperty('properties');
 	});
 
 	it('handles empty property set', () => {
@@ -92,7 +92,7 @@ describe('reduceFeatureCollection', () => {
 			propertiesToKeep: new Set()
 		});
 
-		expect(result.features[0].properties).toEqual({});
+		expect(result.features[0]).not.toHaveProperty('properties');
 	});
 
 	it('handles multiple features', () => {
