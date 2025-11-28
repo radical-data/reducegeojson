@@ -212,9 +212,7 @@
 		class="font-medium text-sky-400 hover:text-sky-300"
 	>
 		Queering the Map
-	</a>
-	— and used in production on Queering the Map. For more tools at the intersection of technology, art
-	and activism, visit
+	</a>. For more tools and projects at the intersection of technology, art and activism, visit
 	<a
 		href="https://radicaldata.org"
 		target="_blank"
@@ -442,30 +440,29 @@
 				</button>
 			</div>
 
-			<h3 class="mt-4 text-xs font-semibold uppercase tracking-wide text-slate-400">Results</h3>
-
-			<div class="mt-1 space-y-1 text-sm text-slate-300">
-				<p>
-					Processed GeoJSON size:
-					<span class="font-medium">
-						{#if processedGeoJSONSize}{formatFileSize(processedGeoJSONSize)}{:else}N/A{/if}
-					</span>
-				</p>
-				<p>
-					Percentage reduction:
-					{#if percentageReduction != null}
-						<span class="font-medium text-emerald-400">
-							{percentageReduction.toFixed(2)}%
-						</span>
-					{:else}
-						<span class="text-slate-500">N/A</span>
-					{/if}
-				</p>
-			</div>
-
 			{#if processedGeoJSON && processedGeoJSONSize != null}
+				<h3 class="mt-4 text-xs font-semibold uppercase tracking-wide text-slate-400">Results</h3>
+				<div class="mt-1 space-y-1 text-sm text-slate-300">
+					<p>
+						Processed GeoJSON size:
+						<span class="font-medium">
+							{formatFileSize(processedGeoJSONSize)}
+						</span>
+					</p>
+					<p>
+						Percentage reduction:
+						{#if percentageReduction != null}
+							<span class="font-medium text-emerald-400">
+								{percentageReduction.toFixed(2)}%
+							</span>
+						{:else}
+							<span class="text-slate-500">N/A</span>
+						{/if}
+					</p>
+				</div>
+
 				<div class="mt-4 border-t border-slate-800 pt-3">
-					<h3 class="text-sm font-semibold text-slate-100">Summary</h3>
+					<h4 class="text-sm font-semibold text-slate-100">Summary</h4>
 					<ul class="mt-2 space-y-1 text-sm text-slate-300">
 						<li>
 							<span class="text-slate-400">Original size:</span>
@@ -506,6 +503,10 @@
 						</a>
 					</p>
 				</div>
+			{:else}
+				<p class="mt-4 text-xs text-slate-500">
+					Run a reduction to see the processed size and percentage change here.
+				</p>
 			{/if}
 		</div>
 
