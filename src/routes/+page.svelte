@@ -20,6 +20,33 @@
 	let showLargeFileWarning = $state(false);
 	let isDragActive = $state(false);
 
+	// Derived step state
+	let hasFile = $derived(geoJSONData !== null);
+	let hasResult = $derived(processedGeoJSON !== null && processedGeoJSONSize !== null);
+
+	type StepStatus = 'current' | 'done' | 'upcoming';
+
+	let step1Status: StepStatus = $derived(hasFile ? 'done' : 'current');
+	let step2Status: StepStatus = $derived(!hasFile ? 'upcoming' : !hasResult ? 'current' : 'done');
+	let step3Status: StepStatus = $derived(
+		!hasFile ? 'upcoming' : !hasResult ? 'upcoming' : 'current'
+	);
+
+	function stepCircleClass(status: StepStatus): string {
+		if (status === 'current') {
+			return 'bg-sky-500 text-slate-950';
+		}
+		if (status === 'done') {
+			return 'bg-emerald-500 text-slate-950';
+		}
+		return 'bg-slate-800 text-slate-400';
+	}
+
+	function stepTitleClass(status: StepStatus): string {
+		if (status === 'upcoming') return 'text-slate-400';
+		return 'text-slate-100';
+	}
+
 	function extractProperties(featureCollection: FeatureCollection): string[] {
 		const propsSet = new SvelteSet<string>();
 		for (const feature of featureCollection.features) {
@@ -37,6 +64,7 @@
 		} else {
 			selectedProperties.add(property);
 		}
+		resetProcessedOutput();
 	};
 
 	const resetProcessedOutput = () => {
@@ -154,10 +182,12 @@
 		for (const p of availableProperties) {
 			selectedProperties.add(p);
 		}
+		resetProcessedOutput();
 	};
 
 	const deselectAllProperties = () => {
 		selectedProperties.clear();
+		resetProcessedOutput();
 	};
 
 	let selectedPropertyCount = $derived(selectedProperties.size);
@@ -203,24 +233,23 @@
 {/if}
 
 <section class="mt-6 grid gap-6 md:grid-cols-[minmax(0,2fr)_minmax(0,3fr)]">
-	<!-- Left column: upload & options -->
-	<div
-		class="space-y-5 rounded-xl border border-slate-700 bg-slate-900/60 p-6 shadow-sm shadow-slate-950/40"
-	>
-		<!-- Step 1 -->
-		<div>
-			<header class="flex items-center gap-2">
-				<span
-					class="flex h-6 w-6 items-center justify-center rounded-full bg-sky-500 text-xs font-semibold text-slate-950"
+	<div class="space-y-4">
+		<div
+			class="rounded-xl border border-slate-800 bg-slate-950/40 p-4 shadow-sm shadow-slate-950/40"
+		>
+			<div class="mb-3 flex items-center gap-2">
+				<div
+					class={`flex h-7 w-7 items-center justify-center rounded-full text-xs font-semibold ${stepCircleClass(
+						step1Status
+					)}`}
 				>
 					1
-				</span>
-				<h2 class="text-sm font-semibold text-slate-100">Upload GeoJSON</h2>
-			</header>
+				</div>
+				<h2 class={`text-sm font-semibold ${stepTitleClass(step1Status)}`}>Upload GeoJSON</h2>
+			</div>
 
-			<!-- Step 1 content: dropzone -->
 			<div
-				class={`relative mt-2 flex cursor-pointer flex-col items-center justify-center rounded-md border px-4 py-6 text-center text-sm transition
+				class={`relative flex cursor-pointer flex-col items-center justify-center rounded-md border px-4 py-6 text-center text-sm transition
 					${
 						isDragActive
 							? 'border-sky-400 bg-slate-900/70'
@@ -261,18 +290,20 @@
 			</div>
 		</div>
 
-		<!-- Step 2: always rendered -->
-		<section class="space-y-3 border-t border-slate-800 pt-4">
-			<header class="flex items-center gap-2">
-				<span
-					class="flex h-6 w-6 items-center justify-center rounded-full bg-slate-700 text-xs font-semibold text-slate-100"
+		<div
+			class="rounded-xl border border-slate-800 bg-slate-950/40 p-4 shadow-sm shadow-slate-950/40"
+		>
+			<div class="mb-3 flex items-center gap-2">
+				<div
+					class={`flex h-7 w-7 items-center justify-center rounded-full text-xs font-semibold ${stepCircleClass(
+						step2Status
+					)}`}
 				>
 					2
-				</span>
-				<h2 class="text-sm font-semibold text-slate-100">Choose what to keep</h2>
-			</header>
+				</div>
+				<h2 class={`text-sm font-semibold ${stepTitleClass(step2Status)}`}>Choose what to keep</h2>
+			</div>
 
-			<!-- Decimal precision -->
 			<div class="space-y-2">
 				<label class="block text-sm font-medium text-slate-200" for="decimalPlaces">
 					Decimal places in coordinates
@@ -284,6 +315,7 @@
 					max="15"
 					step="1"
 					bind:value={coordinatePrecision}
+					onchange={resetProcessedOutput}
 					class="w-32 rounded-md border border-slate-700 bg-slate-900/60 px-3 py-1.5 text-sm text-slate-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-500/60"
 				/>
 				<p class="text-xs text-slate-500">
@@ -291,8 +323,7 @@
 				</p>
 			</div>
 
-			<!-- Properties -->
-			<div class="space-y-2">
+			<div class="mt-3 space-y-2">
 				<div class="flex items-center justify-between gap-2">
 					<p class="text-sm font-medium text-slate-200">Include properties</p>
 					{#if availableProperties.length > 0}
@@ -363,21 +394,22 @@
 					</div>
 				{/if}
 			</div>
-		</section>
+		</div>
 	</div>
 
-	<!-- Right column: actions & results -->
 	<div class="space-y-4">
 		<div
 			class="rounded-xl border border-slate-700 bg-slate-900/60 p-6 shadow-sm shadow-slate-950/40"
 		>
-			<header class="flex items-center gap-2">
-				<span
-					class="flex h-6 w-6 items-center justify-center rounded-full bg-slate-700 text-xs font-semibold text-slate-100"
+			<header class="mb-3 flex items-center gap-2">
+				<div
+					class={`flex h-7 w-7 items-center justify-center rounded-full text-xs font-semibold ${stepCircleClass(
+						step3Status
+					)}`}
 				>
 					3
-				</span>
-				<h2 class="text-sm font-semibold text-slate-100">Reduce & download</h2>
+				</div>
+				<h2 class={`text-sm font-semibold ${stepTitleClass(step3Status)}`}>Reduce & download</h2>
 			</header>
 
 			{#if showLargeFileWarning}
@@ -465,8 +497,7 @@
 					</ul>
 
 					<p class="mt-3 text-xs text-slate-500">
-						If you're working with maps, queer geographies, or critical data visualisation and need
-						help with performance or infrastructure,
+						If you're interested in tech, art and activism,
 						<a
 							href="https://radicaldata.org"
 							target="_blank"
@@ -485,8 +516,8 @@
 
 			<p class="mt-2 text-sm text-slate-300">
 				Many GeoJSON files include far more decimal places in their coordinates than any real
-				application needs — often implying centimetre- or even atomic-level accuracy. All those
-				extra digits make the files unnecessarily large.
+				application needs, often implying centimetre or even atomic level accuracy. All those extra
+				digits make the files unnecessarily large.
 			</p>
 
 			<p class="mt-2 text-sm text-slate-300">
@@ -501,25 +532,3 @@
 		</div>
 	</div>
 </section>
-
-<footer class="mt-10 border-t border-slate-800 pt-4 text-xs text-slate-500">
-	Developed by
-	<a
-		href="https://radicaldata.org"
-		target="_blank"
-		rel="noopener"
-		class="font-medium text-sky-400 hover:text-sky-300"
-	>
-		Radical Data
-	</a>
-	for our Comapping project and the rewrite of Queering the Map. For more tools and projects at the intersection
-	of technology, art and activism, visit
-	<a
-		href="https://radicaldata.org"
-		target="_blank"
-		rel="noopener"
-		class="font-medium text-sky-400 hover:text-sky-300"
-	>
-		radicaldata.org
-	</a>.
-</footer>
