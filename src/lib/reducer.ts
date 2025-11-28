@@ -31,8 +31,8 @@ function filterProperties(fc: FeatureCollection, propertiesToKeep: Set<string>):
 			const { properties, ...rest } = feature;
 			return {
 				...rest,
-				...(Object.keys(filteredProps).length > 0 ? { properties: filteredProps } : {}) // omit `properties` entirely
-			};
+				...(Object.keys(filteredProps).length > 0 ? { properties: filteredProps } : {})
+			} as typeof feature; // Type assertion to preserve intentional omission of properties
 		})
 	};
 }
