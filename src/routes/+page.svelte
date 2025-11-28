@@ -194,35 +194,6 @@
 	All conversions are done locally in your browser; your GeoJSON never leaves your machine.
 </p>
 
-<p class="mt-4 max-w-3xl text-xs text-slate-500">
-	Developed by
-	<a
-		href="https://radicaldata.org"
-		target="_blank"
-		rel="noopener"
-		class="font-medium text-sky-400 hover:text-sky-300"
-	>
-		Radical Data
-	</a>
-	for our Comapping project and the rewrite of
-	<a
-		href="https://www.queeringthemap.com/"
-		target="_blank"
-		rel="noopener"
-		class="font-medium text-sky-400 hover:text-sky-300"
-	>
-		Queering the Map
-	</a>. For more tools and projects at the intersection of technology, art and activism, visit
-	<a
-		href="https://radicaldata.org"
-		target="_blank"
-		rel="noopener"
-		class="font-medium text-sky-400 hover:text-sky-300"
-	>
-		radicaldata.org
-	</a>.
-</p>
-
 {#if errorMessage}
 	<div
 		class="mt-4 rounded-md border border-red-500/40 bg-red-950/40 px-3 py-2 text-sm text-red-200"
@@ -316,7 +287,7 @@
 					class="w-32 rounded-md border border-slate-700 bg-slate-900/60 px-3 py-1.5 text-sm text-slate-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-500/60"
 				/>
 				<p class="text-xs text-slate-500">
-					Typical web maps use 5–6 decimal places (~1–0.1 m accuracy).
+					A good default for web apps is 5–6 decimal places (~1–0.1 m accuracy).
 				</p>
 			</div>
 
@@ -344,7 +315,15 @@
 					{/if}
 				</div>
 
-				{#if availableProperties.length > 0}
+				{#if !geoJSONData}
+					<p class="text-xs text-slate-500">
+						Upload a GeoJSON FeatureCollection to choose which properties to keep.
+					</p>
+				{:else if availableProperties.length === 0}
+					<p class="text-xs text-slate-500">
+						This file only contains geometry; there are no properties to filter.
+					</p>
+				{:else}
 					<div class="space-y-2">
 						<input
 							type="text"
@@ -382,11 +361,6 @@
 							{/if}
 						</div>
 					</div>
-				{:else}
-					<p class="text-xs text-slate-500">
-						This file doesn't have any properties – only geometry – so there's nothing to include or
-						exclude here.
-					</p>
 				{/if}
 			</div>
 		</section>
@@ -503,10 +477,6 @@
 						</a>
 					</p>
 				</div>
-			{:else}
-				<p class="mt-4 text-xs text-slate-500">
-					Run a reduction to see the processed size and percentage change here.
-				</p>
 			{/if}
 		</div>
 
@@ -531,3 +501,25 @@
 		</div>
 	</div>
 </section>
+
+<footer class="mt-10 border-t border-slate-800 pt-4 text-xs text-slate-500">
+	Developed by
+	<a
+		href="https://radicaldata.org"
+		target="_blank"
+		rel="noopener"
+		class="font-medium text-sky-400 hover:text-sky-300"
+	>
+		Radical Data
+	</a>
+	for our Comapping project and the rewrite of Queering the Map. For more tools and projects at the intersection
+	of technology, art and activism, visit
+	<a
+		href="https://radicaldata.org"
+		target="_blank"
+		rel="noopener"
+		class="font-medium text-sky-400 hover:text-sky-300"
+	>
+		radicaldata.org
+	</a>.
+</footer>
